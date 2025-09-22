@@ -17,13 +17,12 @@ public class ManageCommentsView
 
     public async Task ShowMenuAsync()
     {
-        Console.Clear();
         while (true)
         {
             Console.Clear();
-            Console.WriteLine("\n------POSTS MENU------");
+            Console.WriteLine("------POSTS MENU------");
             Console.WriteLine("1. Add comment");
-            Console.WriteLine("2. See all comments");
+            Console.WriteLine("2. See  comments");
             Console.WriteLine("0. Back");
             Console.Write("Choose: ");
             switch (Console.ReadLine())
@@ -53,7 +52,7 @@ public class ManageCommentsView
         Console.Write("Comment: ");
         var body = Console.ReadLine()!; 
         
-        var comment = await _commentRepository.AddAsync(new Comment(0, postId, userId, body));
+        var comment = await _commentRepository.AddAsync(new Comment(0, userId, postId, body));
         Console.WriteLine($"Comment created with ID {comment.Id}");
         Console.Write("Press any key to continue...");
         Console.ReadKey();

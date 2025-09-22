@@ -18,11 +18,10 @@ public class ManagePostsView
 
     public async Task ShowMenuAsync()
     {
-        Console.Clear();
         while (true)
         {
             Console.Clear();
-            Console.WriteLine("\n------POSTS MENU------");
+            Console.WriteLine("------POSTS MENU------");
             Console.WriteLine("1. Create a new post");
             Console.WriteLine("2. View Posts Overview");
             Console.WriteLine("3. View Specific Post");
@@ -63,7 +62,6 @@ public class ManagePostsView
         Console.WriteLine($"Post created with ID {post.Id}");
         Console.Write("Press any key to continue...");
         Console.ReadKey();
-        ShowMenuAsync();
     }
 
     private async Task ViewPostsOverview()
@@ -75,7 +73,6 @@ public class ManagePostsView
         }
         Console.Write("Press any key to continue...");
         Console.ReadKey();
-        ShowMenuAsync();
     }
 
     private async Task ViewSpecificPost()
@@ -99,6 +96,5 @@ public class ManagePostsView
         }
         Console.Write("Press any key to continue...");
         Console.ReadKey();
-        ShowMenuAsync();
     }
 }

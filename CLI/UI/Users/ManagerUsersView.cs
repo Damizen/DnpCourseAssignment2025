@@ -15,7 +15,7 @@ public class ManagerUsersView
         while (true)
         {
             Console.Clear();
-            Console.WriteLine("\n--- USER MENU ---");
+            Console.WriteLine("--- USER MENU ---");
             Console.WriteLine("1. Create User");
             Console.WriteLine("2. List Users");
             Console.WriteLine("0. Back");

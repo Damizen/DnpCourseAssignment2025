@@ -21,11 +21,16 @@ public class CliApp
 
     public async Task StartAsync()
     {
-        Console.Clear();
+        //Probably you are thinking rn what does it do. I had an issue with terminal focus
+        //After the first run, the typed number was going way higher than Select option text is. 
+        //This might be a stupid solution, but I have no idea what could fix it.
+        Console.WriteLine("Click on this window and press any key to start..."); 
+        Console.ReadKey(true);
+
         while (true)
         {
             Console.Clear();
-            Console.WriteLine("\n--- MENU ---");
+            Console.WriteLine("--- MENU ---");
             Console.WriteLine("1. Manage Users");
             Console.WriteLine("2. Manage Posts");
             Console.WriteLine("3. Manage Comments");

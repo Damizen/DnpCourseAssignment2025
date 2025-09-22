@@ -1,10 +1,10 @@
-﻿using InMemoryRepositories;
+﻿using FileRepositories;
 using RepositoryContracts;
 using UI;
 
-var userRepo = new UserInMemoryRepository();
-var postRepo = new PostInMemoryRepository();
-var commentRepo = new CommentInMemoryRepository();
+var userRepo = new UserFileRepository();
+var postRepo = new PostFileRepository();
+var commentRepo = new CommentFileRepository();
 
 var app = new CliApp(userRepo, postRepo, commentRepo);
 await app.StartAsync();
