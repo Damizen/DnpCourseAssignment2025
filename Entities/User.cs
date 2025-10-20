@@ -1,8 +1,17 @@
 ﻿namespace Entities;
 
-public class User(int id, string username, string password)
+public class User
 {
-    public int Id { get; set; } = id;
-    public string Username { get; set; } = username;
-    public string Password { get; set; } = password;
+    public int Id { get; set; }
+    public string Username { get; set; }
+    public string Password { get; set; }
+
+    public User(int id, string username, string password)
+    {
+        this.Id = id;
+        this.Username = username;
+        this.Password = password;
+    }
+
+    public User(){}
 }
