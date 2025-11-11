@@ -1,0 +1,28 @@
+﻿<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">BlazorApp</a>
+    </div>
+</div>
+
+<input type="checkbox" title="Navigation menu" class="navbar-toggler"/>
+
+<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
+    <nav class="nav flex-column">
+        <div class="nav-item">
+            <NavLink href="/users/add" Match="NavLinkMatch.All">
+                <i class="bi bi-person-plus-fill" aria-hidden="true"></i> Add User
+            </NavLink>
+        </div>
+        <div class="nav-item">
+            <NavLink href="/posts/add" Match="NavLinkMatch.All">
+                <i class="bi bi-plus-square" aria-hidden="true"></i> Add Post
+            </NavLink>
+        </div >
+        <div class="nav-item">
+            <NavLink href="/posts" Match="NavLinkMatch.All">
+                <i class="bi bi-card-list" aria-hidden="true"></i> View Posts
+            </NavLink>
+        </div>
+
+    </nav>
+</div>

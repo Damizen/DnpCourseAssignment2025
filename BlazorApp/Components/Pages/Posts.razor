@@ -1,0 +1,68 @@
+﻿@page "/posts"
+@using ApiContracts.Posts
+@using BlazorApp.Service
+@inject IPostService PostService
+@inject IUserService UserService
+@inject NavigationManager NavManager
+
+<h3>All Posts</h3>
+
+@if (posts == null)
+{
+    <p><em>Loading posts...</em></p>
+}
+else if (!posts.Any())
+{
+    <p>No posts yet. <a href="/posts/add">Create one!</a></p>
+}
+else
+{
+    <div class="list-group">
+        @foreach (var post in posts)
+        {
+            <button class="list-group-item list-group-item-action"
+                    @onclick="() => GoToPost(post.Id)">
+                <strong>@post.Title</strong>
+                <br />
+                <small> Author ID: @(GetAuthorName(post.UserId))</small>
+            </button>
+        }
+    </div>
+}
+
+@code {
+    private IEnumerable<PostDto>? posts;
+    private Dictionary<int, string> authorNames = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        posts = await PostService.GetAllPostsAsync();
+        
+        var userIds = posts.Select(p => p.UserId).Distinct().ToList();
+        
+        foreach (var id in userIds)
+        {
+            try
+            {
+                var user = await UserService.GetUserByIdAsync(id);
+                authorNames[id] = user.Username;
+            }
+            catch
+            {
+                authorNames[id] = $"User {id}";
+            }
+        }
+    }
+
+    private void GoToPost(int id)
+    {
+        NavManager.NavigateTo($"/posts/{id}");
+    }
+
+    private string GetAuthorName(int userId)
+    {
+        if (authorNames.TryGetValue(userId, out var name))
+            return name;
+        return $"User {userId}";
+    }
+}

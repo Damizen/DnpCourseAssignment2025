@@ -1,0 +1,160 @@
+﻿@page "/posts/{PostId:int}"
+@using ApiContracts.Comments
+@using ApiContracts.Posts
+@using BlazorApp.Service
+@inject IPostService PostService
+@inject ICommentService CommentService
+@inject IUserService UserService
+
+<h3>Post Details</h3>
+
+@if (loading)
+{
+    <p><em>Loading post...</em></p>
+}
+else if (post == null)
+{
+    <p class="text-danger">Post not found.</p>
+}
+else
+{
+    <div class="card p-3 mb-3 shadow-sm">
+        <h4>@post.Title</h4>
+        <p>@post.Body</p>
+        <p><strong>Author:</strong> @authorName</p>
+    </div>
+
+    <h5>Comments</h5>
+    @if (comments == null)
+    {
+        <p><em>Loading comments...</em></p>
+    }
+    else if (!comments.Any())
+    {
+        <p>No comments yet. Be the first to comment!</p>
+    }
+    else
+    {
+        @foreach (var c in comments)
+        {
+            <div class="border rounded p-2 mb-2">
+                <strong>@GetUserName(c.User_Id):</strong> @c.Body
+            </div>
+        }
+    }
+
+    <hr />
+    <h5>Add a Comment</h5>
+
+    <EditForm Model="newComment" OnValidSubmit="SubmitCommentAsync">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="form-group mb-2">
+            <label>Comment:</label>
+            <InputTextArea @bind-Value="newComment.Body" class="form-control" />
+        </div>
+        <button type="submit" class="btn btn-primary">Add Comment</button>
+    </EditForm>
+
+    @if (!string.IsNullOrEmpty(statusMessage))
+    {
+        <p class="text-success mt-2">@statusMessage</p>
+    }
+}
+
+@code {
+    [Parameter] public int PostId { get; set; }
+
+    private bool loading = true;
+    private PostDto? post;
+    private string? authorName;
+    private List<CommentDto>? comments;
+    private CreateCommentDto newComment = new();
+    private string? statusMessage;
+    private Dictionary<int, string> userNamesCache = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Console.WriteLine($"[DEBUG] Loading post with ID = {PostId}");
+        await LoadPostAndCommentsAsync();
+        Console.WriteLine($"[DEBUG] Post loaded: {post != null}");
+    }
+
+    private async Task LoadPostAndCommentsAsync()
+    {
+        try
+        {
+            loading = true;
+            userNamesCache.Clear();
+            post = null;
+            comments = null;
+            post = await PostService.GetPostByIdAsync(PostId);
+
+            if (post != null)
+            {
+                var author = await UserService.GetUserByIdAsync(post.UserId);
+                authorName = author.Username;
+                userNamesCache[author.Id] = author.Username;
+
+                var allComments = await CommentService.GetAllCommentsAsync();
+                comments = allComments.Where(c => c.Post_Id == PostId).ToList();
+
+                var userIdsToFetch = comments
+                    .Select(c => c.User_Id)
+                    .Distinct()
+                    .Where(id => !userNamesCache.ContainsKey(id))
+                    .ToList();
+                var userTasks = userIdsToFetch.Select(id => UserService.GetUserByIdAsync(id)).ToList();
+                await Task.WhenAll(userTasks);
+
+                foreach (var userTask in userTasks)
+                {
+                    var user = userTask.Result;
+                    if (user != null)
+                    {
+                        userNamesCache[user.Id] = user.Username;
+                    }
+                }
+
+                newComment.User_Id = 2;
+                newComment.Post_Id = PostId;
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"[ERROR] Failed to load post: {e.Message}"); 
+        }
+        finally
+        {
+            loading = false;
+            Console.WriteLine("[DEBUG] LoadPostAndCommentsAsync completed.");
+            StateHasChanged();
+        }
+    }
+
+    private async Task SubmitCommentAsync()
+    {
+        try
+        {
+            await CommentService.AddCommentAsync(newComment);
+            statusMessage = "Comment added successfully!";
+            newComment.Body = "";
+            newComment.User_Id = 2; 
+            await LoadPostAndCommentsAsync(); 
+            await LoadPostAndCommentsAsync();
+        }
+        catch (Exception e)
+        {
+            statusMessage = $"Failed to add comment: {e.Message}";
+        }
+    }
+
+    private string GetUserName(int userId)
+    {
+        if (userNamesCache.TryGetValue(userId, out var username))
+        {
+            return username;
+        }
+        return $"User {userId}";
+    }
+}

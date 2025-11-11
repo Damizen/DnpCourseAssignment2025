@@ -1,0 +1,30 @@
+﻿@page "/"
+@using Microsoft.AspNetCore.Components.Authorization
+@inject NavigationManager NavMgr
+@inject AuthenticationStateProvider AuthProvider
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+<PageTitle>Home</PageTitle>
+
+<h1>Home</h1>
+<AuthorizeView>
+    <Authorized>
+        <h3>Hello, @context.User.Identity?.Name!</h3>
+        <button @onclick="LogoutAsync">Log out</button>
+    </Authorized>
+    <NotAuthorized>
+        <p>lol you are not logged in!</p>
+        Here you can browse interesting posts.
+        <button @onclick='() => NavMgr.NavigateTo("login")'>go to login</button>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private async Task LogoutAsync()
+    {
+        var customAuthProvider = (BlazorApp.Auth.SimpleAuthProvider)AuthProvider;
+        
+        await customAuthProvider.Logout();
+        
+        NavMgr.NavigateTo("/", forceLoad: true);
+    }
+}
